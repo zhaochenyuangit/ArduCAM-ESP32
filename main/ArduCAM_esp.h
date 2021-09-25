@@ -1,3 +1,6 @@
+#ifndef ArduCAM_H
+#define ArduCAM_H
+
 extern "C"
 {
 #include "stdint.h"
@@ -7,9 +10,6 @@ extern "C"
 #include "ArduCAM_I2C.h"
 #include "ArduCAM_SPI.h"
 }
-
-#ifndef ArduCAM_H
-#define ArduCAM_H
 
 #define OV2640_MINI_2MP
 #define OV2640_CAM

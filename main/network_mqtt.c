@@ -35,7 +35,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         ESP_LOGI(TAG, "MQTT_EVENT_DATA");
         if ((listen_topic == NULL) || (interface_q == NULL))
         {
-            ESP_LOGI(TAG,"listen topic not initialized, break");
+            ESP_LOGI(TAG, "listen topic not initialized, break");
             break;
         }
         struct mqtt_msg msg;
@@ -46,7 +46,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             ESP_LOGI(TAG, "queue is full");
             break;
         }
-        ESP_LOGI(TAG,"send out listen message");
+        ESP_LOGI(TAG, "send out listen message");
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -95,10 +95,10 @@ esp_err_t start_mqtt(esp_mqtt_client_handle_t *client_ptr, const char *uri, cons
     return (ESP_OK);
 }
 
-void mqtt_send(esp_mqtt_client_handle_t client, const char *topic, const char *data)
+void mqtt_send(esp_mqtt_client_handle_t client, const char *topic, const char *data, int qos)
 {
     int msg_id;
-    msg_id = esp_mqtt_client_publish(client, topic, data, 0, 0, 0);
+    msg_id = esp_mqtt_client_publish(client, topic, data, 0, qos, 0);
     ESP_LOGD(TAG, "mqtt published, msg id=%d", msg_id);
 }
 

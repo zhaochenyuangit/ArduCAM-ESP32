@@ -15,6 +15,10 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MYSSID "Racoon&Masters"
 #define MYPWD "gotomunich2019"
 #define MYMQTT "mqtt://192.168.178.42"
@@ -45,10 +49,15 @@ esp_err_t start_wifi(void);
  */
 esp_err_t start_mqtt(esp_mqtt_client_handle_t *client, const char *uri, const char *username, const char *password);
 /**
- * @brief publish message with QoS 1
+ * @brief publish message with mqtt
  * @param client the cilent handle
  * @param topic a string
  * @param data a string
+ * @param qos 0, 1 or 2
  */
-void mqtt_send(esp_mqtt_client_handle_t client, const char *topic, const char *data);
+void mqtt_send(esp_mqtt_client_handle_t client, const char *topic, const char *data, int qos);
 void mqtt_listen(esp_mqtt_client_handle_t client, const char *topic, QueueHandle_t *msg_q);
+
+#ifdef __cplusplus
+}
+#endif
