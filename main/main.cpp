@@ -16,7 +16,6 @@ extern "C"
 #include "ArduCAM_SPI.h"
 #include "network_common.h"
 #include "mbedtls/base64.h"
-#include "math.h"
 #include "esp_heap_caps.h"
 }
 
@@ -28,6 +27,27 @@ static SemaphoreHandle_t sema_read_frame = NULL;
 
 ArduCAM myCAM(OV2640, CS_PIN);
 
+static int64_t eclipse_time_ms(bool startend)
+{
+    enum
+    {
+        START = 0,
+        END,
+    };
+    static struct timeval tik, tok;
+    if (startend == START)
+    {
+        gettimeofday(&tik, NULL);
+        return 0;
+    }
+    else
+    {
+        gettimeofday(&tok, NULL);
+        int64_t time_ms = (int64_t)(tok.tv_sec - tik.tv_sec) * 1000 + (tok.tv_usec - tik.tv_usec) / 1000;
+        return time_ms;
+    }
+}
+
 void image_encode_base64(uint8_t *buf, size_t len)
 {
     static uint8_t base64_buf[SPI_MAX_TRANS_SIZE / 3 * 4];
@@ -35,9 +55,7 @@ void image_encode_base64(uint8_t *buf, size_t len)
 
     mbedtls_base64_encode(base64_buf, SPI_MAX_TRANS_SIZE / 3 * 4, &encode_len, buf, len);
     printf("raw data len %d encode len %d\n", len, encode_len);
-    //mqtt_send(client, "ov2640/base64", (char *)base64_buf);
-    base64_buf[30] = '\0';
-    printf("%s", base64_buf);
+    mqtt_send(client, "ov2640/base64", (char *)base64_buf);
 }
 
 void OV2640_valid_check()
@@ -66,13 +84,10 @@ void capture_one_frame()
     printf("start capture\n");
     myCAM.clear_fifo_flag();
     myCAM.start_capture();
-    struct timeval tik, tok;
-    gettimeofday(&tik, NULL);
+    eclipse_time_ms(false);
     while (!myCAM.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
         vTaskDelay(pdMS_TO_TICKS(10));
-    gettimeofday(&tok, NULL);
-    int64_t time_ms = (int64_t)(tok.tv_sec - tik.tv_sec) * 1000 + (tok.tv_usec - tik.tv_usec) / 1000;
-    printf("capture total_time used (in miliseconds): %lld\n", time_ms);
+    printf("capture total_time used (in miliseconds): %lld\n", eclipse_time_ms(true));
 }
 
 void read_frame_buffer(uint8_t *buffer)
@@ -91,21 +106,13 @@ void read_frame_buffer(uint8_t *buffer)
     printf("camcapture fifo length: %d\n", len);
     while (len > 0)
     {
-        printf("remaining len: %d\n", len);
         size_t n_byte_read_in = (len < SPI_MAX_TRANS_SIZE) ? len : SPI_MAX_TRANS_SIZE;
+        printf("read in byte length: %d\n", n_byte_read_in);
         len -= n_byte_read_in;
         myCAM.CS_LOW();
         spi_transfer_bytes(BURST_FIFO_READ, buffer, buffer, n_byte_read_in);
         myCAM.CS_HIGH();
-        for (int row = 0; row < 5; row++)
-        {
-            for (int col = 0; col < 5; col++)
-            {
-                printf("%2x ", buffer[row * 5 + col]);
-            }
-            printf("\n");
-        }
-        printf("\n");
+        image_encode_base64(buffer, n_byte_read_in);
         vTaskDelay(10);
     }
 }
@@ -118,23 +125,25 @@ void take_image(void *_)
     {
         capture_one_frame();
         read_frame_buffer(buffer);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
     free(buffer);
 }
 
 extern "C" void app_main(void)
 {
-    //ESP_ERROR_CHECK(start_wifi());
-    //ESP_ERROR_CHECK(start_mqtt(&client, MYMQTT, NULL, NULL));
+    ESP_ERROR_CHECK(start_wifi());
+    ESP_ERROR_CHECK(start_mqtt(&client, MYMQTT, NULL, NULL));
     ESP_ERROR_CHECK(spi_init());
     ESP_ERROR_CHECK(i2c_master_init());
 
     OV2640_valid_check();
     //Change to JPEG capture mode and initialize the OV2640 module
+    eclipse_time_ms(0);
     myCAM.set_format(JPEG);
     myCAM.InitCAM();
     myCAM.OV2640_set_JPEG_size(OV2640_320x240);
     myCAM.clear_fifo_flag();
+    printf("configure takes %lld ms\n", eclipse_time_ms(1));
     xTaskCreatePinnedToCore(take_image, "take_image", 4096, NULL, 10, NULL, 0);
 }
