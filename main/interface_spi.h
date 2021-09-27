@@ -12,7 +12,7 @@ extern "C" {
 
 #define SPI_MAX_TRANS_SIZE 9600 //multiple times of 32 (for DMA) and 6 (for base64 encoder)
 
-esp_err_t spi_init(void);
+esp_err_t spi_master_init(void);
 
 uint8_t spi_transfer_reg(uint8_t address, uint8_t send_value);
 uint8_t spi_transfer_8(uint8_t send_value);

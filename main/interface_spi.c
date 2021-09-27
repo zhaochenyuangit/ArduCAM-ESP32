@@ -1,9 +1,9 @@
-#include "ArduCAM_SPI.h"
+#include "interface_spi.h"
 #include "string.h"
 
 static spi_device_handle_t spi_handle = NULL;
 
-esp_err_t spi_init(void)
+esp_err_t spi_master_init(void)
 {
     esp_err_t err;
     spi_bus_config_t buscfg = {
@@ -20,9 +20,9 @@ esp_err_t spi_init(void)
     spi_device_interface_config_t devcfg = {
         .command_bits = 8,
         .queue_size = 1,
-        .clock_speed_hz = SPI_MASTER_FREQ_8M / 8 * 7,
+        .clock_speed_hz = SPI_MASTER_FREQ_8M / 8 * 7, //must be strictly slow than ArduChip SPI 8MHz
         .mode = 0,
-        .spics_io_num = -1,
+        .spics_io_num = -1, //capatibility with the ArduCAM library: enable CS pin manually
     };
     err = spi_bus_add_device(SPI_PORT, &devcfg, &spi_handle);
     return err;
@@ -110,6 +110,6 @@ void spi_transfer_bytes(uint8_t command, uint8_t *send_buf, uint8_t *receive_buf
         .tx_buffer = send_buf,
         .rx_buffer = receive_buf,
     };
-    esp_err_t err = spi_device_transmit(spi_handle, &t);
+    esp_err_t err = spi_device_transmit(spi_handle, &t); //for large data use SPI interrupt instead of polling
     ESP_ERROR_CHECK(err);
 }

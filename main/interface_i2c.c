@@ -1,4 +1,4 @@
-#include "ArduCAM_I2C.h"
+#include "interface_i2c.h"
 
 /**
  * @brief i2c master initialization

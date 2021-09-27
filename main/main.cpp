@@ -8,13 +8,13 @@
 #include "sdkconfig.h"
 #include "time.h"
 #include <sys/time.h>
-#include "ArduCAM_esp.h"
+#include "ArduCAM_esp_ov2640.h"
 #include "mbedtls/base64.h"
 #include "esp_heap_caps.h"
 #include "cJSON.h"
 
-#include "ArduCAM_I2C.h"
-#include "ArduCAM_SPI.h"
+#include "interface_i2c.h"
+#include "interface_spi.h"
 #include "network_common.h"
 
 #define BASE64_BUF_SIZE ((SPI_MAX_TRANS_SIZE / 3 + 2) * 4)
@@ -32,7 +32,7 @@ static esp_mqtt_client_handle_t client = NULL;
 static QueueHandle_t q_read_batch = NULL;
 static SemaphoreHandle_t sema_send_batch = NULL;
 
-ArduCAM myCAM(OV2640, CS_PIN);
+ArduCAM_OV2640 myCAM(CS_PIN);
 
 static int64_t eclipse_time_ms(bool startend)
 {
@@ -170,7 +170,7 @@ extern "C" void app_main(void)
 {
     ESP_ERROR_CHECK(start_wifi());
     ESP_ERROR_CHECK(start_mqtt(&client, MYMQTT, NULL, NULL));
-    ESP_ERROR_CHECK(spi_init());
+    ESP_ERROR_CHECK(spi_master_init());
     ESP_ERROR_CHECK(i2c_master_init());
 
     q_read_batch = xQueueCreate(1, sizeof(struct batch_info));
@@ -183,7 +183,7 @@ extern "C" void app_main(void)
     eclipse_time_ms(0);
     myCAM.set_format(JPEG);
     myCAM.InitCAM();
-    myCAM.OV2640_set_JPEG_size(OV2640_320x240);
+    myCAM.set_JPEG_size(OV2640_320x240);
     myCAM.clear_fifo_flag();
     printf("configure takes %lld ms\n", eclipse_time_ms(1));
     xTaskCreatePinnedToCore(take_image, "take_image", 4096, NULL, 10, NULL, 1);
