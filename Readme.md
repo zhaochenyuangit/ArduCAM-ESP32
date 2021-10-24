@@ -1,5 +1,20 @@
 ## ArduCAM OV2640 Mini 2MP PLUS on ESP32
 
+### How to use
+
+Pin connection: the ArduCAM Mini 2MP Plus module has 8 pins, connect them to the esp32 as following.
+
+| ArduCAM | ESP32   |
+| ------- | ------- |
+| CS      | GPIO 5  |
+| MOSI    | GPIO 23 |
+| MISO    | GPIO 26 |
+| SCK     | GPIO 18 |
+| GND     | GND     |
+| VCC     | 3V3     |
+| SDA     | GPIO 21 |
+| SCL     | GPIO 22 |
+
 ### Camera module
 
 There are two types of OV2640 module available. 
@@ -23,6 +38,4 @@ The JPEG format is a compress format of image data with a compress factor of abo
 It takes much computation power to compress and decompress an JPEG image. Fortunately, the OV2640 module has an internal JPEG compressor. When the image format is configured to JPEG, the camera module outputs already the compressed data. The microprocessor just need to read it out and transfer the compressed data to the edge device. No local decompression or further processing is done inside the microprocessor because that will take a long time. Decompression and visualization of the image could be done by the consumer for example a web browser.
 
 A JPEG image binary starts with `0xFFD8` and ends with ` 0xFFD9 `. 
-
-### Base64 encode
 

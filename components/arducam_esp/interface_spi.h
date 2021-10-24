@@ -10,7 +10,7 @@ extern "C" {
 #define PIN_NUM_MOSI GPIO_NUM_23
 #define PIN_NUM_CS GPIO_NUM_5
 
-#define SPI_MAX_TRANS_SIZE 9600 //multiple times of 32 (for DMA) and 6 (for base64 encoder)
+#define SPI_MAX_TRANS_SIZE 9600 //multiple times of 4 (for DMA) and 3 (for base64 encoder)
 
 esp_err_t spi_master_init(void);
 
