@@ -39,7 +39,7 @@ It takes much computation power to compress and decompress an JPEG image. Fortun
 
 A JPEG image binary starts with `0xFFD8` and ends with ` 0xFFD9 `. 
 
-### Added C wrapper functions
+### C wrapper functions
 
 Added C wrapper functions to `ArduCAM_esp_ov2640.cpp` and `ArduCAM_esp_ov2640.h` so the library can be used in the C language.
 
