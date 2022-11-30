@@ -4,14 +4,6 @@
 #include "ArduCAM_esp.h"
 #include "ov2640_regs.h"
 
-#define USING_C
-
-#ifdef USING_C
-
-
-
-#endif
-
 #define ARDUCHIP_FRAMES			0x01
 #define VSYNC_LEVEL_MASK   		0x02
 #define FRAMES_NUM 				0x04
