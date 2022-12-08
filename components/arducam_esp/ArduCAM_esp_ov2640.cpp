@@ -2,6 +2,87 @@
 
 static const char *TAG = "ArduCAM_OV2640";
 
+// wrapper functions for C compatibility, should this be moved to header file?
+void *ArduCAM_OV2640_init(gpio_num_t CS_PIN){
+	return new ArduCAM_OV2640(CS_PIN);
+}
+
+void ArduCAM_write_reg(uint8_t addr, uint8_t data){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	cam->write_reg(addr, data);
+}
+
+uint8_t ArduCAM_read_reg(uint8_t addr){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	return cam->read_reg(addr);
+}
+
+byte ArduCAM_wrSensorReg8_8(int regID, int regDat){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	return cam->wrSensorReg8_8(regID, regDat);
+}
+
+byte ArduCAM_rdSensorReg8_8(uint8_t regID, uint8_t *regDat){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	return cam->rdSensorReg8_8(regID, regDat);
+}
+
+void ArduCAM_flush_fifo(){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	cam->flush_fifo();
+}
+void ArduCAM_clear_fifo_flag(){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	cam->clear_fifo_flag();
+}
+
+void ArduCAM_start_capture(){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	cam->start_capture();
+}
+
+void ArduCAM_set_bit(uint8_t addr, uint8_t bit){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	cam->set_bit(addr, bit);
+}
+
+uint8_t ArduCAM_get_bit(uint8_t addr, uint8_t bit){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	return cam->get_bit(addr, bit);
+}
+
+uint32_t ArduCAM_read_fifo_length(){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	return cam->read_fifo_length();
+}
+
+void ArduCAM_CS_LOW(){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	return cam->CS_LOW();
+}
+
+void ArduCAM_CS_HIGH(){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	return cam->CS_HIGH();
+}
+
+void ArduCAM_OV2640_InitCAM(){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	cam->InitCAM();
+}
+
+void ArduCAM_set_format(byte fmt){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	cam->set_format(fmt);
+}
+
+void ArduCAM_OV2640_set_JPEG_size(int size = OV2640_320x240){
+	ArduCAM_OV2640 *cam = (ArduCAM_OV2640 *)myCAM;
+	cam->set_JPEG_size(size);
+}
+
+// end wrapper functions
+
 void ArduCAM_OV2640::InitCAM()
 {
     wrSensorReg8_8(0xff, 0x01);
@@ -17,6 +98,8 @@ void ArduCAM_OV2640::InitCAM()
         wrSensorRegs8_8(OV2640_320x240_JPEG);
         //wrSensorReg8_8(0xff, 0x00);
         //wrSensorReg8_8(0x44, 0x32);
+    }else{
+		wrSensorRegs8_8(OV2640_QVGA);
     }
 }
 void ArduCAM_OV2640::set_JPEG_size(int size = OV2640_320x240)
