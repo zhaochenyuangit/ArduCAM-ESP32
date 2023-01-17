@@ -43,4 +43,4 @@ A JPEG image binary starts with `0xFFD8` and ends with ` 0xFFD9 `.
 
 Added C wrapper functions to `ArduCAM_esp_ov2640.cpp` and `ArduCAM_esp_ov2640.h` so the library can be used in the C language.
 
-`myCAM = (ArduCAM_OV2640_C *)ArduCAM_OV2640_init(CS_PIN);` should be called at the begining of `app_main()` to populate the container `ArduCAM_OV2640_C *myCAM;` a container to access the `ArduCAM_OV2640` class.
+First, place `extern ArduCAM_OV2640_C *myCAM_C;` globaly prior to the `app_main()` function, then `myCAM_C = (ArduCAM_OV2640_C *)ArduCAM_OV2640_init(CS_PIN);` should be called at the begining of `app_main()` to populate the container `ArduCAM_OV2640_C *myCAM_C;` a container to access the `ArduCAM_OV2640` class.
