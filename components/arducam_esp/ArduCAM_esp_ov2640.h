@@ -29,8 +29,6 @@ extern "C" {
 
 	typedef struct ArduCAM_OV2640_C ArduCAM_OV2640_C;
 
-	ArduCAM_OV2640_C *myCAM;
-
 	// wrapper functions for C compatibility, should this be moved to header file?
 	extern void ArduCAM_set_bit(uint8_t addr, uint8_t bit);
 	extern void *ArduCAM_OV2640_init(gpio_num_t CS_PIN);
