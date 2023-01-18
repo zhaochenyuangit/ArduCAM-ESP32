@@ -2,6 +2,8 @@
 
 static const char *TAG = "ArduCAM_OV2640";
 
+ArduCAM_OV2640_C *myCAM_C;
+
 // wrapper functions for C compatibility, should this be moved to header file?
 void *ArduCAM_OV2640_init(gpio_num_t CS_PIN){
 	return new ArduCAM_OV2640(CS_PIN);
